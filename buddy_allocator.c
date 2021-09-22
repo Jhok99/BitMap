@@ -33,3 +33,36 @@ char* memory_bitmap, int memory_bitmap_size, int min_bucket_size){
     BitMap_init(&allocator->bitmap, num_bits, memory_bitmap);
     print_bitmap(&allocator->bitmap);
 }
+void *BuddyAllocator_malloc(BuddyAllocator *allocator, int size) {
+  BitMap bitmap = allocator->bitmap;
+  size = size+ sizeof(int); //sizeof(int) byte vengono usati per salvare l'indice della bitmap
+  assert(allocator->memory_size  > size);
+  //con questo mi calcolo il livello al quale si troverà il blocco da allocare
+
+  int actual_level=check_level(allocator,size,allocator->min_bucket_size,allocator->num_levels);
+  printf("Provo ad allocare il nuovo blocco di size %d al livello %d\n", size,actual_level);
+  // la dimensione del blocco sarà la totale /2*num_level
+  int size_start= (allocator->memory_size)>>actual_level;
+  printf("level=%d size_start=%d tot_memory=%d\n\n",actual_level,size_start,allocator->memory_size);
+
+  //scandire da first_idx del livello 
+  int idx=-1;
+  for(int i=firstIdx(actual_level); i<firstIdx(actual_level+1); i++){
+    if(!BitMap_bit(&bitmap,i)){ //se non è occupato
+      idx=i; //lo occuperò e salvo l'indice
+      break;
+    }
+  }
+  //assert("non ci sono livelli liberi a sufficienza" && idx!=-1);
+  if (idx==-1){
+    printf("ERRORE: Non ci sono livelli liberi a sufficienza\n\n");
+    return NULL;
+  }
+  set_parent(&bitmap, idx , 1);
+  set_child(&bitmap, idx ,1);
+  printf("l'indice è %d\n",idx);
+  print_bitmap(&bitmap);
+  char* start_memory=allocator->memory+startIdx(idx)*size_start;
+  *((int*)start_memory)=idx; //ritorno il ptr+ 4 e salvo nei primi 4 byte il valore dell'indice
+   return (void*)(start_memory + 4);
+}
