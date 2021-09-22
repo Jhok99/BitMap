@@ -42,7 +42,7 @@ void print_bitmap(BitMap* bit_map){
     }
     else{
       printf("%d ",BitMap_bit(bit_map,i));
-      for(int k=bit_map->nume_bits>>(levelIdx(i)+1);k>0;k--){
+      for(int k=bit_map->num_bits>>(levelIdx(i)+1);k>0;k--){
         printf("  ");
       }
     }
