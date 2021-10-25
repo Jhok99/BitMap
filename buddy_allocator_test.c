@@ -26,9 +26,14 @@ printf("init... ");
   printf("---------------------------\n");
 
   void* p5=BuddyAllocator_malloc(&alloc, 10);
+  printf("FREE P1\n");
+  printf("---------------------------\n");
   BuddyAllocator_free(&alloc, p1);
+  printf("FREE P5\n");
+  printf("---------------------------\n");
   BuddyAllocator_free(&alloc, p5);
-
+  printf("ALLOCO P4\n");
+  printf("---------------------------\n");
   void* p4=BuddyAllocator_malloc(&alloc, 50);
   printf("ALLOCO P2\n");
   printf("---------------------------\n");
